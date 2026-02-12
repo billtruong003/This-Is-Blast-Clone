@@ -1,0 +1,35 @@
+{
+  "name": "com.universal.dragdrop",
+  "version": "1.0.0",
+  "displayName": "Universal Drag & Drop",
+  "description": "A flexible drag-and-drop system supporting UI-UI, UI-3D, UI-2D, 3D-3D, 2D-2D interactions for inventory systems, strategy games, and more.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "keywords": ["drag", "drop", "inventory", "strategy", "ui", "interaction"],
+  "author": {
+    "name": "Universal DragDrop"
+  },
+  "type": "library",
+  "samples": [
+    {
+      "displayName": "UI to UI (Inventory)",
+      "description": "Basic inventory drag and drop between UI slots",
+      "path": "Samples~/01_UItoUI"
+    },
+    {
+      "displayName": "UI to 3D (Strategy Deploy)",
+      "description": "Drag units from UI panel onto 3D battlefield",
+      "path": "Samples~/02_UIto3D"
+    },
+    {
+      "displayName": "3D to 3D (Unit Movement)",
+      "description": "Drag 3D objects to other 3D positions",
+      "path": "Samples~/03_3Dto3D"
+    },
+    {
+      "displayName": "UI to 2D (Tower Defense)",
+      "description": "Drag towers from UI onto 2D grid",
+      "path": "Samples~/04_UIto2D"
+    }
+  ]
+}
