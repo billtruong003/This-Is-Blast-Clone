@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf6cce29261bf45b5b02b62a90b5e711, type: 3}
+  m_Name: NewLevel
+  m_EditorClassIdentifier: ImageToVoxel.Runtime::ImageToVoxel.Game.LevelData
+  levelIndex: 1
+  mapData: {fileID: 11400000, guid: 90b5709efd7c544d691c143b52d9c2b1, type: 2}
+  colorConfigs:
+  - RangeName: Color_0
+    BlockColor: {r: 0.9, g: 0.225, b: 0.225, a: 1}
+  - RangeName: Color_1
+    BlockColor: {r: 0.7649999, g: 0.9, b: 0.225, a: 1}
+  - RangeName: Color_2
+    BlockColor: {r: 0.225, g: 0.9, b: 0.49500006, a: 1}
+  - RangeName: Color_3
+    BlockColor: {r: 0.225, g: 0.4949999, b: 0.9, a: 1}
+  - RangeName: Color_4
+    BlockColor: {r: 0.7650001, g: 0.225, b: 0.9, a: 1}
+  blocksPerBlast: 20

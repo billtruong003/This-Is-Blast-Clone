@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34867181d50194e1e8d801e5eed64daa, type: 3}
+  m_Name: BlasterDef 2
+  m_EditorClassIdentifier: JellyGunner::JellyGunner.BlasterDefinition
+  type: 0
+  mesh: {fileID: -5495902117074765545, guid: 159d09ab0beb04eebad78271e2234e32, type: 3}
+  modelScale: 2
+  recoilAngle: 5
