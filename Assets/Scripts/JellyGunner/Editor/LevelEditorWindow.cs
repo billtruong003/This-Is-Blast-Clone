@@ -258,53 +258,56 @@ namespace JellyGunner.Editor
             SaveToTarget();
             if (_target == null) return;
 
-            int[] colorAmmoNeeded = new int[4];
+            int[] colorHPNeeded = new int[4];
+            int targetCount = _cells.Count; // Approximate constraint check
+
             foreach (var kvp in _cells)
-                colorAmmoNeeded[(int)kvp.Value.Color] += TierConfig.GetHP(kvp.Value.Tier);
+                colorHPNeeded[(int)kvp.Value.Color] += TierConfig.GetHP(kvp.Value.Tier);
 
-            var supply = new List<LevelData.SupplyEntry>();
+            var supplyList = new List<LevelData.SupplyEntry>();
 
+            // Generate Deterministic Supply (No Shuffle, Greedy Allocation)
             for (int c = 0; c < 4; c++)
             {
-                int remaining = colorAmmoNeeded[c];
-                if (remaining <= 0) continue;
+                int hpNeeded = colorHPNeeded[c];
+                if (hpNeeded <= 0) continue;
 
-                while (remaining > 0)
+                while (hpNeeded > 0)
                 {
-                    BlasterType type;
-                    int ammo;
+                    BlasterType type = BlasterType.Pistol;
+                    int ammo = TierConfig.GetAmmo(BlasterType.Pistol);
 
-                    if (remaining >= 120)
+                    if (hpNeeded >= 120)
                     {
                         type = BlasterType.Gatling;
-                        ammo = TierConfig.GetAmmo(type);
+                        ammo = 120;
                     }
-                    else if (remaining >= 60)
+                    else if (hpNeeded >= 60)
                     {
                         type = BlasterType.Sniper;
-                        ammo = TierConfig.GetAmmo(type);
-                    }
-                    else
-                    {
-                        type = BlasterType.Pistol;
-                        ammo = TierConfig.GetAmmo(type);
+                        ammo = 60;
                     }
 
-                    supply.Add(new LevelData.SupplyEntry
+                    supplyList.Add(new LevelData.SupplyEntry
                     {
                         color = (BlockColor)c,
                         type = type
                     });
 
-                    remaining -= ammo;
+                    hpNeeded -= ammo;
                 }
             }
 
-            ShuffleList(supply);
-            _target.waves[0].supply = supply.ToArray();
+            if (supplyList.Count > targetCount)
+            {
+                Debug.LogWarning($"[LevelEditor] Generated {supplyList.Count} supply items for {targetCount} targets. Supply > Target count constraint warning!");
+            }
+
+            _target.waves[0].supply = supplyList.ToArray();
 
             EditorUtility.SetDirty(_target);
             AssetDatabase.SaveAssets();
+            Debug.Log($"Generated {supplyList.Count} supply items matching Target Layout.");
         }
 
         private void LoadFromTarget()
@@ -335,19 +338,8 @@ namespace JellyGunner.Editor
 
         private void RandomFill()
         {
-            _cells.Clear();
-            for (int y = 0; y < _gridRows; y++)
-            {
-                for (int x = 0; x < _gridColumns; x++)
-                {
-                    if (Random.value > 0.7f) continue;
-                    _cells[new Vector2Int(x, y)] = new CellData
-                    {
-                        Color = (BlockColor)Random.Range(0, (int)BlockColor.Count),
-                        Tier = (EnemyTier)Random.Range(0, 2)
-                    };
-                }
-            }
+            // Disable random fill as per request to 'fix color'
+            Debug.Log("Random Fill is disabled. Please design the target layout manually.");
         }
 
         private void CreateNewLevelAsset()

@@ -13,6 +13,12 @@ Shader "JellyGunner/ToonLit_Basic"
         [Header(Rim Light)]
         _RimColor("Rim Color", Color) = (1, 1, 1, 1)
         _RimPower("Rim Power", Range(0.1, 10)) = 3
+
+        [Header(Outline)]
+        [ToggleUI] _UseMeshOutline("Enable Mesh Outline", Float) = 0
+        _OutlineColor("Outline Color", Color) = (0, 0, 0, 1)
+        _OutlineWidth("Outline Width", Range(0, 0.1)) = 0.02
+        _DepthBias("Depth Bias", Range(-10, 10)) = 0
     }
 
     SubShader
@@ -25,13 +31,13 @@ Shader "JellyGunner/ToonLit_Basic"
         }
         LOD 200
 
+        // ---------------------------------------------------------
+        // 1. Forward Lit Pass (Main Lighting)
+        // ---------------------------------------------------------
         Pass
         {
             Name "ForwardLit"
-            Tags
-            {
-                "LightMode" = "UniversalForward"
-            }
+            Tags { "LightMode" = "UniversalForward" }
 
             HLSLPROGRAM
             #pragma vertex Vertex
@@ -52,6 +58,12 @@ Shader "JellyGunner/ToonLit_Basic"
             float _Smoothness;
             half4 _RimColor;
             float _RimPower;
+            
+            // Outline props
+            half4 _OutlineColor;
+            float _OutlineWidth;
+            float _DepthBias;
+            float _UseMeshOutline;
             CBUFFER_END
 
             TEXTURE2D(_BaseMap);
@@ -124,13 +136,13 @@ Shader "JellyGunner/ToonLit_Basic"
             ENDHLSL
         }
 
+        // ---------------------------------------------------------
+        // 2. Shadow Caster Pass
+        // ---------------------------------------------------------
         Pass
         {
             Name "ShadowCaster"
-            Tags
-            {
-                "LightMode" = "ShadowCaster"
-            }
+            Tags { "LightMode" = "ShadowCaster" }
 
             ZWrite On
             ZTest LEqual
@@ -190,6 +202,192 @@ Shader "JellyGunner/ToonLit_Basic"
             half4 Fragment(Varyings input) : SV_Target
             {
                 return 0;
+            }
+            ENDHLSL
+        }
+
+        // ---------------------------------------------------------
+        // 3. Selection Mask Pass (NEW: For Bill-SSOutline)
+        // ---------------------------------------------------------
+        Pass
+        {
+            Name "SelectionMask"
+            Tags { "LightMode" = "SelectionMask" }
+            
+            ZWrite On
+            ColorMask R // Only need Red channel for mask
+
+            HLSLPROGRAM
+            #pragma vertex Vertex
+            #pragma fragment Fragment
+            
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            Varyings Vertex(Attributes input)
+            {
+                Varyings output;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                return output;
+            }
+
+            half4 Fragment(Varyings input) : SV_Target
+            {
+                // Return solid Red to mark this object in the Selection Mask
+                return half4(1, 0, 0, 1);
+            }
+            ENDHLSL
+        }
+
+        // ---------------------------------------------------------
+        // 4. Depth Normals Pass
+        // ---------------------------------------------------------
+        Pass
+        {
+            Name "DepthNormals"
+            Tags { "LightMode" = "DepthNormals" }
+
+            ZWrite On
+            Cull Back
+
+            HLSLPROGRAM
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+            #pragma multi_compile_instancing
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS   : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float3 normalWS   : TEXCOORD1;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            Varyings DepthNormalsVertex(Attributes input)
+            {
+                Varyings output = (Varyings)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                output.normalWS = TransformObjectToWorldNormal(input.normalOS);
+
+                return output;
+            }
+
+            float4 DepthNormalsFragment(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                float3 normalWS = normalize(input.normalWS);
+                float3 normalVS = mul((float3x3)UNITY_MATRIX_V, normalWS);
+                return float4(PackNormalOctRectEncode(normalVS), 0.0, 0.0);
+            }
+            ENDHLSL
+        }
+
+        // ---------------------------------------------------------
+        // 5. Inverted Hull Outline Pass (Mesh Outline)
+        // ---------------------------------------------------------
+        Pass
+        {
+            Name "Outline"
+            Tags { "LightMode" = "SRPDefaultUnlit" }
+            
+            Cull Front
+            ZWrite On
+            ZTest LEqual
+
+            HLSLPROGRAM
+            #pragma vertex OutlineVertex
+            #pragma fragment OutlineFragment
+            #pragma multi_compile_instancing
+            #pragma multi_compile_fog
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            CBUFFER_START(UnityPerMaterial)
+            float4 _BaseMap_ST;
+            half4 _BaseColor;
+            half4 _ShadowColor;
+            float _Threshold;
+            float _Smoothness;
+            half4 _RimColor;
+            float _RimPower;
+            half4 _OutlineColor;
+            float _OutlineWidth;
+            float _DepthBias;
+            float _UseMeshOutline; // Toggle
+            CBUFFER_END
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float fogFactor : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            Varyings OutlineVertex(Attributes input)
+            {
+                Varyings output;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+
+                // Check if Mesh Outline is enabled
+                if (_UseMeshOutline < 0.5)
+                {
+                    // If disabled, collapse vertex to 0 to discard it
+                    output.positionCS = 0;
+                    output.fogFactor = 0;
+                    return output;
+                }
+
+                float3 positionOS = input.positionOS.xyz + input.normalOS * _OutlineWidth;
+                output.positionCS = TransformObjectToHClip(positionOS);
+
+                #if defined(UNITY_REVERSED_Z)
+                    output.positionCS.z -= _DepthBias * 0.0001;
+                #else
+                    output.positionCS.z += _DepthBias * 0.0001;
+                #endif
+
+                output.fogFactor = ComputeFogFactor(output.positionCS.z);
+                return output;
+            }
+
+            half4 OutlineFragment(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                half4 color = _OutlineColor;
+                color.rgb = MixFog(color.rgb, input.fogFactor);
+                return color;
             }
             ENDHLSL
         }
