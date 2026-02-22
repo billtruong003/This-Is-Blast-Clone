@@ -1,0 +1,38 @@
+{
+    "sourceFile": "Assets/Scripts/Block/GameManager.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1771519019389,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1771519031456,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class GameManager : MonoBehaviour\r\n {\r\n     public static GameManager Instance { get; private set; }\r\n-    rigi\r\n+    rigid\r\n     [Header(\"References\")]\r\n     public GameObject SupplyPrefab;\r\n     [SerializeField] private LayoutManager _layoutManager;\r\n     [SerializeField] private TrayManager _trayManager;\r\n"
+                },
+                {
+                    "date": 1771519040956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class GameManager : MonoBehaviour\r\n {\r\n     public static GameManager Instance { get; private set; }\r\n-    rigid\r\n+    r\r\n     [Header(\"References\")]\r\n     public GameObject SupplyPrefab;\r\n     [SerializeField] private LayoutManager _layoutManager;\r\n     [SerializeField] private TrayManager _trayManager;\r\n"
+                },
+                {
+                    "date": 1771519047775,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class GameManager : MonoBehaviour\r\n {\r\n     public static GameManager Instance { get; private set; }\r\n-    r\r\n+    rig\r\n     [Header(\"References\")]\r\n     public GameObject SupplyPrefab;\r\n     [SerializeField] private LayoutManager _layoutManager;\r\n     [SerializeField] private TrayManager _trayManager;\r\n"
+                },
+                {
+                    "date": 1771519052846,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class GameManager : MonoBehaviour\r\n {\r\n     public static GameManager Instance { get; private set; }\r\n-    rig\r\n+    \r\n     [Header(\"References\")]\r\n     public GameObject SupplyPrefab;\r\n     [SerializeField] private LayoutManager _layoutManager;\r\n     [SerializeField] private TrayManager _trayManager;\r\n"
+                },
+                {
+                    "date": 1771641150422,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,12 +38,13 @@\n             Debug.LogError(\"GameManager: LevelData is missing!\");\r\n             return;\r\n         }\r\n \r\n-        // 1. Initialize Targets (Enemy Layout)\r\n+                // 1. Initialize Targets (Enemy Layout)\r\n         if (_targetManager != null)\r\n         {\r\n-            _targetManager.Initialize(_levelData);\r\n+            // Use random fill logic instead of LevelData for now\r\n+            _targetManager.InitializeRandom();\r\n         }\r\n         else\r\n         {\r\n             Debug.LogError(\"GameManager: BlockTargetManager is missing!\");\r\n"
+                }
+            ],
+            "date": 1771519019389,
+            "name": "Commit-0",
+            "content": "using UnityEngine;\r\nusing System.Collections.Generic;\r\nusing JellyGunner;\r\n\r\npublic class GameManager : MonoBehaviour\r\n{\r\n    public static GameManager Instance { get; private set; }\r\n    rigi\r\n    [Header(\"References\")]\r\n    public GameObject SupplyPrefab;\r\n    [SerializeField] private LayoutManager _layoutManager;\r\n    [SerializeField] private TrayManager _trayManager;\r\n    [SerializeField] private BlockTargetManager _targetManager;\r\n\r\n    [Header(\"Level Settings\")]\r\n    [SerializeField] private LevelData _levelData;\r\n    [SerializeField] private BlockConfigSO _blockConfig;\r\n\r\n    private void Awake()\r\n    {\r\n        if (Instance != null && Instance != this)\r\n        {\r\n            Destroy(gameObject);\r\n            return;\r\n        }\r\n        Instance = this;\r\n    }\r\n\r\n    private void Start()\r\n    {\r\n        GenerateLevel();\r\n    }\r\n\r\n    private void GenerateLevel()\r\n    {\r\n        if (_levelData == null)\r\n        {\r\n            Debug.LogError(\"GameManager: LevelData is missing!\");\r\n            return;\r\n        }\r\n\r\n        // 1. Initialize Targets (Enemy Layout)\r\n        if (_targetManager != null)\r\n        {\r\n            _targetManager.Initialize(_levelData);\r\n        }\r\n        else\r\n        {\r\n            Debug.LogError(\"GameManager: BlockTargetManager is missing!\");\r\n        }\r\n\r\n        // 2. Initialize Supply (Ammo Layout)\r\n        if (_layoutManager != null)\r\n        {\r\n            // Check waves\r\n            if (_levelData.waves == null || _levelData.waves.Length == 0)\r\n            {\r\n                Debug.LogWarning(\"GameManager: No waves in LevelData!\");\r\n                return;\r\n            }\r\n\r\n            var supplies = new List<SupplyData>();\r\n            var waveSupplies = _levelData.waves[0].supply;\r\n\r\n            if (waveSupplies != null)\r\n            {\r\n                int idCounter = 0;\r\n                foreach (var entry in waveSupplies)\r\n                {\r\n                    var config = _blockConfig != null ? _blockConfig.GetDefinition(entry.color) : null;\r\n                    Color visualColor = config != null ? config.VisualColor : Color.white;\r\n\r\n                    supplies.Add(new SupplyData\r\n                    {\r\n                        ID = idCounter++,\r\n                        Amount = entry.Ammo,\r\n                        BaseColor = visualColor,\r\n                        ColorEnum = entry.color\r\n                    });\r\n                }\r\n            }\r\n\r\n            _layoutManager.InitializeGrid(supplies);\r\n        }\r\n        else\r\n        {\r\n            Debug.LogError(\"GameManager: LayoutManager is missing!\");\r\n        }\r\n    }\r\n\r\n    public void ProcessSupplySelection(SupplyItem item)\r\n    {\r\n        if (_trayManager == null || _layoutManager == null) return;\r\n\r\n        if (!_trayManager.HasSpace())\r\n        {\r\n            ShakeTrayEffect();\r\n            return;\r\n        }\r\n\r\n        _layoutManager.RemoveItemFromGrid(item);\r\n        _trayManager.AddSupply(item);\r\n    }\r\n\r\n    private void ShakeTrayEffect()\r\n    {\r\n        if (_trayManager == null) return;\r\n\r\n        LeanTween.cancel(_trayManager.gameObject);\r\n        LeanTween.moveLocalX(_trayManager.gameObject, 0.1f, 0.05f)\r\n            .setEaseShake()\r\n            .setLoopPingPong(2);\r\n    }\r\n}\r\n"
+        }
+    ]
+}

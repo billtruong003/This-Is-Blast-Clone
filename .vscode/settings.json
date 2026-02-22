@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "URP Project.slnx"
+    "dotnet.defaultSolution": "This-Is-Blast-Clone.slnx"
 }

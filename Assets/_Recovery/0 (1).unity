@@ -1036,60 +1036,6 @@ MonoBehaviour:
   OnDragEndEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!1 &692159034
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 692159036}
-  - component: {fileID: 692159035}
-  m_Layer: 0
-  m_Name: BlockTargetmanager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &692159035
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 692159034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87bbf58731bea487eab126957d9f09bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BlockTargetManager
-  _blockConfig: {fileID: 11400000, guid: d2f2e0999ce9c4c98871b92587fc6e5b, type: 2}
-  _container: {fileID: 692159036}
-  _gridSize: {x: 10, y: 25}
-  _anchor: 7
-  _manualOffset: {x: 0, y: 0, z: 0}
-  _spacing: {x: 4, y: 4}
-  _slideDirection: {x: 0, y: 0, z: 1}
-  _columnAxis: {x: 1, y: 0, z: 0}
-  _showGizmos: 1
-  _gizmoColor: {r: 1, g: 0, b: 0, a: 1}
---- !u!4 &692159036
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 692159034}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 15}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &724069600
 GameObject:
   m_ObjectHideFlags: 0
@@ -1565,7 +1511,7 @@ MonoBehaviour:
   SupplyPrefab: {fileID: 4606067950960501579, guid: dbf7f6b30d77c4e368580a922478d1eb, type: 3}
   _layoutManager: {fileID: 1276802632}
   _trayManager: {fileID: 2044395839}
-  _targetManager: {fileID: 692159035}
+  _targetManager: {fileID: 0}
   _levelData: {fileID: 11400000, guid: fb14fab4b391c4a5a8dda64490fae623, type: 2}
   _blockConfig: {fileID: 11400000, guid: d2f2e0999ce9c4c98871b92587fc6e5b, type: 2}
 --- !u!4 &876855841
@@ -2153,7 +2099,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1324173621}
   m_Layer: 0
-  m_Name: Tray
+  m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2846,4 +2792,3 @@ SceneRoots:
   - {fileID: 1324173621}
   - {fileID: 1276802631}
   - {fileID: 876855841}
-  - {fileID: 692159036}

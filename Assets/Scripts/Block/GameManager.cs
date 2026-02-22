@@ -42,7 +42,8 @@ public class GameManager : MonoBehaviour
         // 1. Initialize Targets (Enemy Layout)
         if (_targetManager != null)
         {
-            _targetManager.Initialize(_levelData);
+            // Use random fill logic instead of LevelData for now
+            _targetManager.InitializeRandom();
         }
         else
         {

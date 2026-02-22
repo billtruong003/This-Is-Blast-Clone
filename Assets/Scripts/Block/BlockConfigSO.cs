@@ -23,4 +23,10 @@ public class BlockConfigSO : ScriptableObject
     {
         return _definitions.Find(d => d.ColorEnum == color);
     }
+
+    public BlockDefinition GetRandomDefinition()
+    {
+        if (_definitions == null || _definitions.Count == 0) return null;
+        return _definitions[Random.Range(0, _definitions.Count)];
+    }
 }

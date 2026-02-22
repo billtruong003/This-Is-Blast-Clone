@@ -1,0 +1,18 @@
+{
+    "sourceFile": "Assets/Scripts/Block/BlockConfigSO.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1771641115720,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1771641115720,
+            "name": "Commit-0",
+            "content": "using UnityEngine;\r\nusing System.Collections.Generic;\r\nusing JellyGunner;\r\n\r\n[CreateAssetMenu(fileName = \"BlockConfig\", menuName = \"JellyGunner/Block Config\")]\r\npublic class BlockConfigSO : ScriptableObject\r\n{\r\n    [System.Serializable]\r\n    public class BlockDefinition\r\n    {\r\n        public BlockColor ColorEnum;\r\n        public Color VisualColor;\r\n        public GameObject Prefab;\r\n        public int BaseHP = 1;\r\n        \r\n        // Support multi-cell blocks if needed visually or logically\r\n        public Vector2Int Size = Vector2Int.one; \r\n    }\r\n\r\n    [SerializeField] private List<BlockDefinition> _definitions;\r\n\r\n\r\n\r\n\r\n        public BlockDefinition GetDefinition(BlockColor color)\r\n    {\r\n        return _definitions.Find(d => d.ColorEnum == color);\r\n    }\r\n\r\n    public BlockDefinition GetRandomDefinition()\r\n    {\r\n        if (_definitions == null || _definitions.Count == 0) return null;\r\n        return _definitions[Random.Range(0, _definitions.Count)];\r\n    }\r\n}"
+        }
+    ]
+}
